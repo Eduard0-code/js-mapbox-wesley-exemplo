@@ -110,8 +110,9 @@ function montarMapa(dadosLocais) {
         center: centralLatLong, // Localização central do mapa
         zoom: 9 // Zoom inicial.
     });
-
+    
     // Adiciona marcadores para cada local:
+    function popUpMarcador(dadosLocais){
     dadosLocais.forEach((local) => {
         let popup = new mapboxgl.Popup({ offset: 25 })
             .setHTML(`<h3>
@@ -127,6 +128,19 @@ function montarMapa(dadosLocais) {
             .setPopup(popup)
             .addTo(map);
     });
+    }
+    
+    function popUpMarcador(dadosLocais){
+                const marker = new mapboxgl.Marker({ color: local.cor })
+            .setLngLat(local.latlong)
+            .setPopup(popup)
+            .addTo(map);
+    }
+
+    popUpMarcador(dadosLocais)
+
+
+
 
     // Obtém a localização do usuário e adiciona um marcador:
     navigator.geolocation.getCurrentPosition(processarGetCurrentPosition, () => { alert('Erro ao obter localização.') });
@@ -147,12 +161,15 @@ function processar() {
     const nome = document.getElementById("nome").value.trim();
     const latitude = document.getElementById("latitude").value.trim();
     const longitude = document.getElementById("longitude").value.trim();
+    const descricao = document.getElementById("descricao").value.trim();
+    const endereco = document.getElementById("endereco").value.trim();
     const cor = document.getElementById("cor").value;
+
 
     var local = {
         "id": id++,
-        "descricao": "informar...",
-        "endereco": "informar...",
+        "descricao": descricao,
+        "endereco": endereco,
         "favorito": true,
         "cidade": nome,
         "latlong": [
@@ -165,6 +182,17 @@ function processar() {
 
     processarPosicao(local);
 }
+
+const enviarLocalização = async (produto) => {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            body: JSON.stringify(produto)
+        })
+            .then(response => response.json())
+            .then(() => buscarProdutos())
+            .catch(() => alert("Erro ao enviar produto!"));
+    };
 
 // Função para processar a localização:
 function processarPosicao(local) {
